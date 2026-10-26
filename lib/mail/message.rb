@@ -1931,15 +1931,9 @@ module Mail
       find_attachment
     end
 
+    # Returns all parts of the message, flattening nested multiparts into a
+    # single pre-order list.
     def all_parts
-      # Iterative pre-order traversal with a single accumulator.
-      #
-      # The previous implementation recursed and rebuilt an array with
-      # +flatten+ at every level, which made the cost super-linear in the
-      # nesting depth and could exhaust the thread stack (SystemStackError)
-      # on a deeply nested multipart message. This is linear in the number
-      # of parts and uses no recursion, while preserving the original
-      # pre-order ordering.
       result = []
       stack  = parts.reverse
       until stack.empty?

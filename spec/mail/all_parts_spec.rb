@@ -4,7 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Mail::Message do
   describe "#all_parts" do
-    it "returns parts in pre-order with nested multiparts flattened" do
+    it "should return parts in pre-order with nested multiparts flattened" do
       mail = Mail.new do
         content_type 'multipart/mixed; boundary="X"'
         part(content_type: 'multipart/alternative; boundary="Y"') do |alt|
@@ -23,7 +23,7 @@ RSpec.describe Mail::Message do
       ])
     end
 
-    it "handles a deeply nested multipart message without stack overflow" do
+    it "should walk a deeply nested multipart message without raising" do
       raw = "Content-Type: text/plain\r\n\r\nhello\r\n"
       1000.times do |i|
         b = "b#{i}"
