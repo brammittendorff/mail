@@ -1932,7 +1932,23 @@ module Mail
     end
 
     def all_parts
-      parts.map { |p| [p, p.all_parts] }.flatten
+      # Iterative pre-order traversal with a single accumulator.
+      #
+      # The previous implementation recursed and rebuilt an array with
+      # +flatten+ at every level, which made the cost super-linear in the
+      # nesting depth and could exhaust the thread stack (SystemStackError)
+      # on a deeply nested multipart message. This is linear in the number
+      # of parts and uses no recursion, while preserving the original
+      # pre-order ordering.
+      result = []
+      stack  = parts.reverse
+      until stack.empty?
+        part = stack.pop
+        result << part
+        children = part.parts
+        stack.concat(children.reverse) unless children.empty?
+      end
+      result
     end
 
     def find_first_mime_type(mt)
